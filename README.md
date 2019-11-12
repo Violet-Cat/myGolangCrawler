@@ -13,3 +13,7 @@ the crawler catch html info into excel
 爬虫将网页信息抓取并导入到excel中
 
 #PS:爬虫没有优化，会导致服务器压力，请谨慎使用
+
+
+
+#PS:调用的使用的是相对路径，所以真的要谨慎使用啊 2019.11.12
