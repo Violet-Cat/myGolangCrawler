@@ -9,21 +9,20 @@ import(
 	"regexp"
 	"github.com/PuerkitoBio/goquery"
 	"time"
-	"runtime"
 )
 
 func main()  {
-	runtime.GOMAXPROCS(2)
 	fmt.Println("************************")
+	ch := make(chan string)
 	list := linked.InitLinked()
-	
+	go linked.WrtingCheck(&list,ch)
 	client := &http.Client{
         CheckRedirect: func(req *http.Request, via []*http.Request) error {
             return http.ErrUseLastResponse
         },
 	}
 	fmt.Println("The pageInfo is reading,please waiting")
-	for i:=10001;i<10005;i++ {
+	for i:=10001;i<10015;i++ {
 		// 20191012  55575
 
 		time.Sleep(1 * time.Second)
@@ -60,13 +59,20 @@ func main()  {
 
 			
 			linked.Insert(returnNum,title,desc,&list)
-			
+			fmt.Println("the pageInfo set in struct")
 		}
 	}
 	
 	linked.Endwriting()
-	linked.WrtingCheck(&list)
+	
+	<-ch
+
 	fmt.Println("************************")
 	fmt.Println("the main is over")
 	//fmt.Println(linked.IsEmpty(&list))
+	/*for !linked.IsEmpty(&list){
+		fmt.Println("the linked is not empty")
+		//此处睡的时间可以长长一些，不然的话文件可能写不完
+		time.Sleep(10 * time.Second)
+	}*/
 }

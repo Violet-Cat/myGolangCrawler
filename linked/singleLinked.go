@@ -4,6 +4,7 @@ import(
 	"fmt"
 	"github.com/tealeg/xlsx"
 	"sync"
+	"time"
 )
 var lock sync.Mutex
 var aa int = 1
@@ -91,7 +92,7 @@ func Endwriting(){
 	fmt.Println("the reading is over,the writing can be stop")
 }
 
-func WrtingCheck(list *PageInfoNode){
+func WrtingCheck(list *PageInfoNode,ch chan string){
 	fmt.Println("************************")
 	fmt.Println("into Writing  00000")
 
@@ -114,6 +115,7 @@ func WrtingCheck(list *PageInfoNode){
 	cell.Value = "简介"
 	for{
 		//fmt.Println("in for")
+		time.Sleep(2 * time.Second)
 		if (list.Next==nil&&aa==0){
 			break
 		}else if list.Next!=nil{
@@ -132,6 +134,7 @@ func WrtingCheck(list *PageInfoNode){
 			DelNode(list)
 
 			lock.Unlock()
+			fmt.Println("the cell is add")
 		}
 	}
 	err = file.Save("../MyXLSXFile.xlsx")
@@ -139,4 +142,5 @@ func WrtingCheck(list *PageInfoNode){
         fmt.Printf(err.Error())
 	}
 	fmt.Println("the excel file is already")
+	ch <- "I'm finashed"
 }
