@@ -3,8 +3,10 @@ package linked
 import(
 	"fmt"
 	"github.com/tealeg/xlsx"
+	"sync"
 )
-
+var lock sync.Mutex
+var aa int = 1
 //结构体
 type PageInfoNode struct{
 
@@ -28,6 +30,8 @@ func IsEmpty(pageInfoNode *PageInfoNode) bool{
 
 //插入节点
 func Insert(returnNum string,title string,desc string,position *PageInfoNode){
+	//defer lock.Unlock()
+    lock.Lock()
 	tempCell := new(PageInfoNode)
 	if tempCell == nil{
 		fmt.Println("err:out of space")
@@ -44,12 +48,12 @@ func Insert(returnNum string,title string,desc string,position *PageInfoNode){
 	}
 	tempCell.Next = position.Next
 	position.Next = tempCell
-	
-	
+	lock.Unlock()
 }
 
 //显示节点
 func ShowNode(pageInfoNode *PageInfoNode){
+
 	if pageInfoNode.Next == nil{
 		fmt.Println("the linked id empty")
 	}else{
@@ -66,7 +70,7 @@ func ShowNode(pageInfoNode *PageInfoNode){
 }
 
 //删除节点
-func DelNode(pageInfoNode *PageInfoNode)  {
+func DelNode(pageInfoNode *PageInfoNode) {
 	if pageInfoNode.Next == nil{
 		fmt.Println("the linked id empty")
 	}else{
@@ -75,40 +79,47 @@ func DelNode(pageInfoNode *PageInfoNode)  {
 }
 
 
+func StartWriting(pageInfoNode *PageInfoNode){
+	fmt.Println("into Writing")
+	aa= 1
+	//wrtingCheck(*pageInfoNode)
+}
 
+func Endwriting() bool{
+	aa = 0
+	fmt.Println("the reading is over,the writing can be stop")
+	fmt.Println(aa)
+	return true
+}
 
-func GetListeningResult(list *PageInfoNode){
-	//无结果，无关闭 --- 自旋锁等待
-	//有结果        ---- 写入
-	//无结果，有关闭 ---- 关闭线程
-
-	//linked.IsEmpty()
-	fmt.Println("The start writing")
+func WrtingCheck(list *PageInfoNode){
+	fmt.Println("into Writing  00000")
 
 	var file *xlsx.File
     var sheet *xlsx.Sheet
 	var row *xlsx.Row
-	//var row1 *xlsx.Row
     var cell *xlsx.Cell
-    var err error
-
-    file = xlsx.NewFile()
+	var err error
+	file = xlsx.NewFile()
     sheet, err = file.AddSheet("Sheet1")
     if err != nil {
         fmt.Printf(err.Error())
-    }
-    row = sheet.AddRow()
+	}
+	row = sheet.AddRow()
 	cell = row.AddCell()
 	cell.Value = "页面号"
 	cell = row.AddCell()
 	cell.Value = "标题"
 	cell = row.AddCell()
 	cell.Value = "简介"
-
-	fmt.Println("get in loop")
-
-	if !IsEmpty(list){
-		for{
+	for{
+		//fmt.Println("in for")
+		if (list.Next==nil&&aa==0){
+			break
+		}else if list.Next!=nil{
+			//defer lock.Unlock()
+    		lock.Lock()
+			//getListeningResult(list)
 			list = list.Next
 			row = sheet.AddRow()
 			cell = row.AddCell()
@@ -117,15 +128,12 @@ func GetListeningResult(list *PageInfoNode){
 			cell.Value = list.title
 			cell = row.AddCell()
 			cell.Value = list.desc
-			if list.Next == nil{
-				break
-			}
-		} 
+			lock.Unlock()
+		}
 	}
-
 	err = file.Save("../MyXLSXFile.xlsx")
     if err != nil {
         fmt.Printf(err.Error())
-    }
-	fmt.Println("The excel end writing")
+	}
+	fmt.Println("the excel file is already")
 }

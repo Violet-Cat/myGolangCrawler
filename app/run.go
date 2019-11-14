@@ -8,20 +8,25 @@ import(
 	"strconv"
 	"regexp"
 	"github.com/PuerkitoBio/goquery"
+	"time"
+	"runtime"
 )
 
 func main()  {
+	runtime.GOMAXPROCS(2)
 	fmt.Println("************************")
 	list := linked.InitLinked()
-
-
+	
 	client := &http.Client{
         CheckRedirect: func(req *http.Request, via []*http.Request) error {
             return http.ErrUseLastResponse
         },
 	}
-	for i:=10001;i<10010;i++ {
+	for i:=10001;i<10100;i++ {
 		// 20191012  55575
+
+		time.Sleep(1 * time.Second)
+
 		url := "https://volmoe.com/comic/"+strconv.Itoa(i)+".htm"
 		resp, err := client.Get(url)
 		//fmt.Println(url)
@@ -51,9 +56,15 @@ func main()  {
 			})
 			returnNum = strconv.Itoa(i)+""
 			//fmt.Println(returnNum,"\n",title,"\n",desc)
+
+			
 			linked.Insert(returnNum,title,desc,&list)
+			
 		}
 	}
 	
-	linked.GetListeningResult(&list)
+	fmt.Println(linked.Endwriting())
+	linked.WrtingCheck(&list)
+	fmt.Println("the main is over")
+	
 }
