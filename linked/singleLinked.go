@@ -85,14 +85,14 @@ func StartWriting(pageInfoNode *PageInfoNode){
 	//wrtingCheck(*pageInfoNode)
 }
 
-func Endwriting() bool{
+func Endwriting(){
 	aa = 0
+	fmt.Println("************************")
 	fmt.Println("the reading is over,the writing can be stop")
-	fmt.Println(aa)
-	return true
 }
 
 func WrtingCheck(list *PageInfoNode){
+	fmt.Println("************************")
 	fmt.Println("into Writing  00000")
 
 	var file *xlsx.File
@@ -120,14 +120,17 @@ func WrtingCheck(list *PageInfoNode){
 			//defer lock.Unlock()
     		lock.Lock()
 			//getListeningResult(list)
-			list = list.Next
+			//list = list.Next
 			row = sheet.AddRow()
 			cell = row.AddCell()
-			cell.Value = list.returnNum
+			cell.Value = list.Next.returnNum
 			cell = row.AddCell()
-			cell.Value = list.title
+			cell.Value = list.Next.title
 			cell = row.AddCell()
-			cell.Value = list.desc
+			cell.Value = list.Next.desc
+
+			DelNode(list)
+
 			lock.Unlock()
 		}
 	}

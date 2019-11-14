@@ -22,7 +22,8 @@ func main()  {
             return http.ErrUseLastResponse
         },
 	}
-	for i:=10001;i<10100;i++ {
+	fmt.Println("The pageInfo is reading,please waiting")
+	for i:=10001;i<10005;i++ {
 		// 20191012  55575
 
 		time.Sleep(1 * time.Second)
@@ -63,8 +64,9 @@ func main()  {
 		}
 	}
 	
-	fmt.Println(linked.Endwriting())
+	linked.Endwriting()
 	linked.WrtingCheck(&list)
+	fmt.Println("************************")
 	fmt.Println("the main is over")
-	
+	//fmt.Println(linked.IsEmpty(&list))
 }
