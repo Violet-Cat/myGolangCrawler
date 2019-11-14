@@ -2,7 +2,7 @@ package main
 
 import(
 	"fmt"
-	"../linked"
+	"myGolangCrawler/linked"
 	"net/http"
 	"log"
 	"strconv"
